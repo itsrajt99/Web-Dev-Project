@@ -1,0 +1,57 @@
+import React, { useContext, useEffect, useState } from 'react'
+import { AppContext } from '../../Context/AppContext'
+import toast from 'react-hot-toast';
+
+
+const SellerLogin = () => {
+    const {isSeller,setIsSeller,navigate,axios} = useContext(AppContext);
+    const [email,setEmail] = useState("");
+    const [password,setPassword] = useState("");
+
+    const submitHandler = async(e)=>{
+        try {
+          e.preventDefault();
+          const {data} = await axios.post('/api/seller/login',{email,password});
+          if(data.success){
+            toast.success(data.message);
+            setIsSeller(true);
+            navigate('/seller');
+          }
+          else{
+            toast.error(data.message)
+          }
+        } catch (error) {
+          toast.error(error.message);
+        }
+        
+    }
+
+    useEffect(()=>{
+        if(isSeller){
+            navigate("/seller")
+        }
+    },[isSeller])
+  return !isSeller &&(
+    <form onSubmit={submitHandler} className='min-h-screen flex items-center text-sm'>
+       <div className='flex flex-col gap-5 m-auto items-start p-8 py-12 min-w-80 sm:min-w-88
+       rounded-lg shadow-xl border border-gray-200'>
+        <p className='text-2xl font-medium m-auto'>
+            <span className='text-indigo-500'>Seller</span>Login</p>
+            <div className='w-full'>
+               <p>Email</p>
+               <input onChange={(e)=>setEmail(e.target.value)} type="email" value={email} required  placeholder='type here' className='border  border-gray-200 rounded w-full
+               p-2 mt-1 outline-indigo-500'/>
+            </div>
+            <div className='w-full'>
+               <p>Password</p>
+               <input type="password"  onChange={(e)=>setPassword(e.target.value)} required placeholder='type here' value={password}
+                className='border  border-gray-200 rounded w-full
+               p-2 mt-1 outline-indigo-500'/>
+            </div>
+            <button className='bg-indigo-500 text-white w-full py-2 rounded-md cursor-pointer'>Login</button>
+       </div>
+    </form>
+  )
+}
+
+export default SellerLogin
